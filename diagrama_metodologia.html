@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <script src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js"></script>
+    <style>
+        body {
+            background: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 40px;
+        }
+        .mermaid {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <div class="mermaid">
+flowchart TB
+    subgraph FASE1["FASE 1: ANÁLISE"]
+        A["Levantamento de Requisitos"]
+        A --> A1["Pesquisa sobre inclusão digital"]
+        A --> A2["Identificação do público-alvo"]
+        A --> A3["Definição de requisitos"]
+    end
+    
+    subgraph FASE2["FASE 2: DESIGN"]
+        B["Projeto Arquitetural"]
+        B --> B1["Stack: React + Vite + Tailwind"]
+        B --> B2["Arquitetura de componentes"]
+        B --> B3["Princípios SOLID"]
+    end
+    
+    subgraph FASE3["FASE 3: DESENVOLVIMENTO"]
+        C["Implementação"]
+        C --> C1["Páginas principais"]
+        C --> C2["Inventário + Pontos de Coleta"]
+        C --> C3["Componentização"]
+    end
+    
+    subgraph FASE4["FASE 4: QUALIDADE"]
+        D["Análise de Qualidade"]
+        D --> D1["Acessibilidade WCAG 2.1"]
+        D --> D2["HTML semântico + ARIA"]
+        D --> D3["Responsividade"]
+    end
+    
+    subgraph FASE5["FASE 5: CONFIGURAÇÃO"]
+        E["Gerenciamento"]
+        E --> E1["Controle de versão Git"]
+        E --> E2["Estrutura padronizada"]
+        E --> E3["Dependências npm"]
+    end
+    
+    subgraph FASE6["FASE 6: ENTREGA"]
+        F["Validação e Deploy"]
+        F --> F1["Build otimizado"]
+        F --> F2["Verificação de performance"]
+        F --> F3["Validação dos fluxos"]
+    end
+    
+    FASE1 --> FASE2
+    FASE2 --> FASE3
+    FASE3 --> FASE4
+    FASE4 --> FASE5
+    FASE5 --> FASE6
+    
+    style FASE1 fill:#0f766e,stroke:#14b8a6,color:#fff
+    style FASE2 fill:#7c3aed,stroke:#a78bfa,color:#fff
+    style FASE3 fill:#0891b2,stroke:#22d3ee,color:#fff
+    style FASE4 fill:#059669,stroke:#34d399,color:#fff
+    style FASE5 fill:#d97706,stroke:#fbbf24,color:#fff
+    style FASE6 fill:#dc2626,stroke:#f87171,color:#fff
+    </div>
+    <script>
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+    </script>
+</body>
+</html>
