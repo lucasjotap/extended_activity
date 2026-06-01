@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { CheckCircle, Laptop, Monitor, Smartphone, Tablet } from 'lucide-react'
+import { addDonation } from '../utils/storage'
 
 const equipmentTypes = [
   { id: 'desktop', label: 'Desktop', icon: Monitor },
@@ -11,6 +12,36 @@ const equipmentTypes = [
 function Donate() {
   const [submitted, setSubmitted] = useState(false)
   const [selected, setSelected] = useState('')
+  const [formData, setFormData] = useState({
+    name: '',
+    email: '',
+    phone: '',
+    city: '',
+    condition: '',
+    pickup: 'dropoff',
+    description: '',
+    brand: '',
+  })
+
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value })
+  }
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    addDonation({
+      type: selected,
+      brand: formData.brand || `${selected} genérico`,
+      condition: formData.condition,
+      description: formData.description,
+      donor: formData.name,
+      email: formData.email,
+      phone: formData.phone,
+      city: formData.city,
+      pickup: formData.pickup,
+    })
+    setSubmitted(true)
+  }
 
   if (submitted) {
     return (
@@ -37,7 +68,7 @@ function Donate() {
         </p>
       </div>
 
-      <form onSubmit={(e) => { e.preventDefault(); setSubmitted(true) }} className="mt-10 space-y-6">
+      <form onSubmit={handleSubmit} className="mt-10 space-y-6">
         <section className="card p-6 sm:p-8">
           <h2 className="text-lg font-bold text-white">Seus dados</h2>
           <p className="mt-1 text-sm text-slate-400">Usaremos estas informações apenas para contato.</p>
@@ -45,19 +76,19 @@ function Donate() {
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="donor-name">Nome *</label>
-              <input id="donor-name" type="text" required className="input mt-2" placeholder="Seu nome completo" />
+              <input id="donor-name" name="name" type="text" required className="input mt-2" placeholder="Seu nome completo" value={formData.name} onChange={handleChange} />
             </div>
             <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="donor-email">E-mail *</label>
-              <input id="donor-email" type="email" required className="input mt-2" placeholder="seu@email.com" />
+              <input id="donor-email" name="email" type="email" required className="input mt-2" placeholder="seu@email.com" value={formData.email} onChange={handleChange} />
             </div>
             <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="donor-phone">Telefone</label>
-              <input id="donor-phone" type="tel" className="input mt-2" placeholder="(00) 00000-0000" />
+              <input id="donor-phone" name="phone" type="tel" className="input mt-2" placeholder="(00) 00000-0000" value={formData.phone} onChange={handleChange} />
             </div>
             <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="donor-city">Cidade *</label>
-              <input id="donor-city" type="text" required className="input mt-2" placeholder="Sua cidade" />
+              <input id="donor-city" name="city" type="text" required className="input mt-2" placeholder="Sua cidade" value={formData.city} onChange={handleChange} />
             </div>
           </div>
         </section>
@@ -97,8 +128,12 @@ function Donate() {
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>
+              <label className="text-sm font-semibold text-slate-200" htmlFor="brand">Marca/Modelo</label>
+              <input id="brand" name="brand" type="text" className="input mt-2" placeholder="Ex: Dell Inspiron 15" value={formData.brand} onChange={handleChange} />
+            </div>
+            <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="condition">Condição *</label>
-              <select id="condition" required className="input mt-2">
+              <select id="condition" name="condition" required className="input mt-2" value={formData.condition} onChange={handleChange}>
                 <option value="">Selecione...</option>
                 <option value="working">Funcionando perfeitamente</option>
                 <option value="minor-issues">Pequenos defeitos</option>
@@ -108,7 +143,7 @@ function Donate() {
             </div>
             <div>
               <label className="text-sm font-semibold text-slate-200" htmlFor="pickup">Entrega</label>
-              <select id="pickup" className="input mt-2">
+              <select id="pickup" name="pickup" className="input mt-2" value={formData.pickup} onChange={handleChange}>
                 <option value="dropoff">Vou levar a um ponto de coleta</option>
                 <option value="pickup">Quero agendar retirada (se disponível)</option>
               </select>
@@ -119,9 +154,12 @@ function Donate() {
             <label className="text-sm font-semibold text-slate-200" htmlFor="description">Descrição</label>
             <textarea
               id="description"
+              name="description"
               rows={4}
               className="input mt-2"
               placeholder="Modelo, ano, especificações, acessórios inclusos..."
+              value={formData.description}
+              onChange={handleChange}
             />
           </div>
         </section>

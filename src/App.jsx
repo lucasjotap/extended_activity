@@ -7,6 +7,7 @@ import Receive from './pages/Receive'
 import CollectionPoints from './pages/CollectionPoints'
 import Inventory from './pages/Inventory'
 import About from './pages/About'
+import Feedback from './pages/Feedback'
 
 function App() {
   return (
@@ -23,6 +24,7 @@ function App() {
           <Route path="/pontos-coleta" element={<CollectionPoints />} />
           <Route path="/inventario" element={<Inventory />} />
           <Route path="/sobre" element={<About />} />
+          <Route path="/feedback" element={<Feedback />} />
         </Routes>
       </main>
       <Footer />

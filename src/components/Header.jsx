@@ -8,6 +8,7 @@ const links = [
   { to: '/receber', label: 'Receber' },
   { to: '/pontos-coleta', label: 'Pontos de coleta' },
   { to: '/inventario', label: 'Inventário' },
+  { to: '/feedback', label: 'Feedback' },
   { to: '/sobre', label: 'Sobre' },
 ]
 

@@ -1,7 +1,28 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowRight, HandHeart, MapPin, Recycle, Search, ShieldCheck, Star, Truck, Users } from 'lucide-react'
+import { getDonations, getRequests, seedDemoData } from '../utils/storage'
 
 function Home() {
+  const [stats, setStats] = useState({
+    donations: 150,
+    organizations: 45,
+    points: 8,
+    people: 500,
+  })
+
+  useEffect(() => {
+    seedDemoData()
+    const donations = getDonations()
+    const requests = getRequests()
+    setStats({
+      donations: Math.max(150, 150 + donations.length),
+      organizations: Math.max(45, 45 + requests.length),
+      points: 8,
+      people: Math.max(500, 500 + (requests.reduce((sum, r) => sum + (r.people || 0), 0))),
+    })
+  }, [])
+
   return (
     <div>
       {/* Hero */}
@@ -64,10 +85,10 @@ function Home() {
 
             <div className="grid grid-cols-2 md:grid-cols-4 gap-10 max-w-4xl mx-auto mt-2">
               {[
-                { value: '150+', label: 'Doações registradas' },
-                { value: '45', label: 'Organizações atendidas' },
-                { value: '12', label: 'Pontos de coleta' },
-                { value: '500+', label: 'Pessoas impactadas' },
+                { value: `${stats.donations}+`, label: 'Doações registradas' },
+                { value: `${stats.organizations}`, label: 'Organizações atendidas' },
+                { value: `${stats.points}`, label: 'Pontos de coleta' },
+                { value: `${stats.people}+`, label: 'Pessoas impactadas' },
               ].map(stat => (
                 <div key={stat.label} className="text-center">
                   <div className="text-3xl md:text-4xl font-bold text-white mb-2">{stat.value}</div>

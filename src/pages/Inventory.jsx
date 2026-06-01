@@ -1,31 +1,46 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Search } from 'lucide-react'
+import { getDonations, seedDemoData } from '../utils/storage'
 
-const items = [
-  { id: 1, name: 'Dell Optiplex 7080', type: 'Desktop', condition: 'Funcionando', status: 'available', date: '2025-01-15' },
-  { id: 2, name: 'Lenovo ThinkPad T480', type: 'Notebook', condition: 'Funcionando', status: 'available', date: '2025-01-20' },
-  { id: 3, name: 'Samsung Galaxy Tab A7', type: 'Tablet', condition: 'Pequenos defeitos', status: 'reserved', date: '2025-02-01' },
-  { id: 4, name: 'HP ProBook 450 G7', type: 'Notebook', condition: 'Funcionando', status: 'donated', date: '2025-02-10' },
-  { id: 5, name: 'iMac 2019 21"', type: 'Desktop', condition: 'Funcionando', status: 'available', date: '2025-02-15' },
-  { id: 6, name: 'Motorola Moto G52', type: 'Smartphone', condition: 'Precisa reparo', status: 'maintenance', date: '2025-02-20' },
-  { id: 7, name: 'Dell Monitor 24"', type: 'Monitor', condition: 'Funcionando', status: 'available', date: '2025-03-01' },
-  { id: 8, name: 'Acer Aspire 5', type: 'Notebook', condition: 'Pequenos defeitos', status: 'reserved', date: '2025-03-05' },
-  { id: 9, name: 'iPad 9ª geração', type: 'Tablet', condition: 'Funcionando', status: 'donated', date: '2025-03-10' },
-  { id: 10, name: 'HP Desktop Pro G2', type: 'Desktop', condition: 'Funcionando', status: 'available', date: '2025-03-12' },
-  { id: 11, name: 'Samsung Galaxy A14', type: 'Smartphone', condition: 'Funcionando', status: 'available', date: '2025-03-15' },
-  { id: 12, name: 'Lenovo IdeaPad 3', type: 'Notebook', condition: 'Precisa reparo', status: 'maintenance', date: '2025-03-18' },
-]
+const typeLabels = {
+  desktop: 'Desktop',
+  notebook: 'Notebook',
+  tablet: 'Tablet',
+  smartphone: 'Smartphone',
+}
+
+const conditionLabels = {
+  working: 'Funcionando',
+  'minor-issues': 'Pequenos defeitos',
+  'needs-repair': 'Precisa reparo',
+  'parts-only': 'Apenas peças',
+}
 
 const statusConfig = {
-  available: { label: 'Disponível', pill: 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400' },
-  reserved: { label: 'Reservado', pill: 'bg-purple-500/10 border border-purple-500/20 text-purple-400' },
-  donated: { label: 'Doado', pill: 'bg-blue-500/10 border border-blue-500/20 text-blue-400' },
-  maintenance: { label: 'Manutenção', pill: 'bg-slate-700 text-slate-400' },
+  'Disponível': { label: 'Disponível', pill: 'bg-cyan-500/10 border border-cyan-500/20 text-cyan-400' },
+  'Reservado': { label: 'Reservado', pill: 'bg-purple-500/10 border border-purple-500/20 text-purple-400' },
+  'Doado': { label: 'Doado', pill: 'bg-blue-500/10 border border-blue-500/20 text-blue-400' },
+  'Manutenção': { label: 'Manutenção', pill: 'bg-slate-700 text-slate-400' },
 }
 
 function Inventory() {
   const [search, setSearch] = useState('')
   const [filter, setFilter] = useState('all')
+  const [items, setItems] = useState([])
+
+  useEffect(() => {
+    seedDemoData()
+    const donations = getDonations()
+    setItems(donations.map((d, i) => ({
+      id: i + 1,
+      name: d.brand || `${typeLabels[d.type] || d.type}`,
+      type: typeLabels[d.type] || d.type,
+      condition: conditionLabels[d.condition] || d.condition,
+      status: d.status || 'Disponível',
+      date: d.createdAt ? new Date(d.createdAt).toLocaleDateString('pt-BR') : '-',
+      city: d.city,
+    })))
+  }, [])
 
   const filtered = useMemo(() => {
     return items.filter(item => {
@@ -35,25 +50,29 @@ function Inventory() {
       const matchFilter = filter === 'all' || item.status === filter
       return matchSearch && matchFilter
     })
-  }, [filter, search])
+  }, [filter, search, items])
+
+  const statusCounts = useMemo(() => ({
+    'Disponível': items.filter(i => i.status === 'Disponível').length,
+    'Reservado': items.filter(i => i.status === 'Reservado').length,
+    'Doado': items.filter(i => i.status === 'Doado').length,
+    'Manutenção': items.filter(i => i.status === 'Manutenção').length,
+  }), [items])
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
       <div className="max-w-2xl">
-        <h1 className="text-4xl font-extrabold tracking-tight text-white">Inventário</h1>
+        <h1 className="text-4xl font-extrabold tracking-tight gradient-text">Inventário</h1>
         <p className="mt-3 text-lg text-slate-400">Equipamentos cadastrados e status de disponibilidade.</p>
       </div>
 
       <div className="mt-10 grid grid-cols-2 lg:grid-cols-4 gap-4">
-        {Object.entries(statusConfig).map(([key, config]) => {
-          const count = items.filter(i => i.status === key).length
-          return (
-            <div key={key} className="card p-5">
-              <div className="text-sm font-semibold text-slate-400">{config.label}</div>
-              <div className="mt-1 text-3xl font-extrabold text-white">{count}</div>
-            </div>
-          )
-        })}
+        {Object.entries(statusConfig).map(([key, config]) => (
+          <div key={key} className="card p-5">
+            <div className="text-sm font-semibold text-slate-400">{config.label}</div>
+            <div className="mt-1 text-3xl font-extrabold text-white">{statusCounts[key] || 0}</div>
+          </div>
+        ))}
       </div>
 
       <div className="mt-8 flex flex-col sm:flex-row gap-4">
@@ -75,10 +94,10 @@ function Inventory() {
           aria-label="Filtrar por status"
         >
           <option value="all">Todos</option>
-          <option value="available">Disponível</option>
-          <option value="reserved">Reservado</option>
-          <option value="donated">Doado</option>
-          <option value="maintenance">Manutenção</option>
+          <option value="Disponível">Disponível</option>
+          <option value="Reservado">Reservado</option>
+          <option value="Doado">Doado</option>
+          <option value="Manutenção">Manutenção</option>
         </select>
       </div>
 
@@ -103,8 +122,8 @@ function Inventory() {
                   <td className="px-4 py-3 text-slate-300 hidden sm:table-cell">{item.type}</td>
                   <td className="px-4 py-3 text-slate-300 hidden md:table-cell">{item.condition}</td>
                   <td className="px-4 py-3">
-                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusConfig[item.status].pill}`}>
-                      {statusConfig[item.status].label}
+                    <span className={`inline-flex items-center rounded-full px-3 py-1 text-xs font-semibold ${statusConfig[item.status]?.pill || 'bg-slate-700 text-slate-400'}`}>
+                      {statusConfig[item.status]?.label || item.status}
                     </span>
                   </td>
                   <td className="px-4 py-3 font-mono text-xs text-slate-400 hidden lg:table-cell">{item.date}</td>
